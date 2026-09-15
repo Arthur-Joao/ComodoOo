@@ -118,3 +118,9 @@ class Jogador:
             self.listaImagens[self.imagemAtual],
             self.posicao
         )
+
+    def resetar(self, x, y):
+        self.posicao = [x, y]
+        self.velocidade_y = 0
+        self.no_chao = False
+        self.rect.topleft = (x, y)
