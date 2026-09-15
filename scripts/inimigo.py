@@ -6,20 +6,37 @@ class Inimigo:
         self.rect = pygame.Rect(x, y, largura, altura)
         self.cor = (220, 60, 60)
         self.velocidade = 2
-        self.raio_deteccao = 250
+        self.raio_deteccao = 300
         self.posicao = [x, y]
+        self.posicao_y_base = float(y) # Posição Y original sem o efeito
+        self.tempo_flutuacao = 0        # Contador de tempo para o seno
+        self.amplitude = 8               # Quantidade de pixels que sobe/desce
+        self.velocidade_flutuacao = 0.05
 
     def perseguir(self, jogador):
         distancia_x = jogador.rect.centerx - self.rect.centerx
         distancia_y = jogador.rect.centery - self.rect.centery
 
-        distanci_total = math.hypot(distancia_x, distancia_y)
+        distancia_total = math.hypot(distancia_x, distancia_y)
 
-        if distanci_total < self.raio_deteccao and distanci_total != 0:
-            if distancia_x > 0:
-                self.rect.x += self.velocidade
-            elif distancia_x < 0:
-                self.rect.x -= self.velocidade
+        if 0 < distancia_total < self.raio_deteccao:
+            direcao_x = distancia_x / distancia_total
+            direcao_y = distancia_y / distancia_total
+
+            self.rect.x += direcao_x * self.velocidade
+            self.posicao_y_base += direcao_y * self.velocidade
+            self.rect.y = self.posicao_y_base
+        
+        else:
+            self.tempo_flutuacao += self.velocidade_flutuacao
+            
+            # math.sin varia de -1 a 1 -> multiplica pela amplitude
+            deslocamento = math.sin(self.tempo_flutuacao) * self.amplitude
+            
+            # Aplica o movimento em relação à posição base
+            self.rect.y = self.posicao_y_base + deslocamento
+
+        
 
     def desenhar(self,tela):
         pygame.draw.rect(tela, self.cor, self.rect) 
